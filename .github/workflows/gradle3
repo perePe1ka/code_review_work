@@ -1,0 +1,27 @@
+name: Scheduled CI with Gradle
+
+on:
+  schedule:
+    - cron: '30 12 * * 3'  # Run every Wednesday at 12:30
+    - cron: '0 22 * * 5'   # Run every Friday at 22:00
+permissions:
+  contents: read
+jobs:
+  gradle:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        jdk: [8, 11, 17]
+    runs-on: ${{ matrix.os }}
+    env:
+      JDK_VERSION: ${{ matrix.jdk }}
+    steps:
+      - name: checkout Repo
+        uses: actions/checkout@v3
+      - name: setup gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Change wrapper premission
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+      
